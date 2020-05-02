@@ -181,8 +181,11 @@ public class Avro1124RESTRepositoryClient extends BaseRepository implements Repo
       RepositoryUtil.validateSchemaOrSubject(schemaId);
       String path = getName() + "/id/" + schemaId;
       try {
-        String schema = webResource.path(path).get(String.class);
-        return new SchemaEntry(schemaId, schema);
+        String schema = webResource.path(path).type(MediaType.TEXT_PLAIN_TYPE).get(String.class);
+        // hack for now. parse out the html and extract the pre-formatted text.
+        //TODO change the format to return proper text value
+        String parsedSchema = schema.substring(schema.indexOf("<pre>") + 5, schema.indexOf("</pre>"));
+        return new SchemaEntry(schemaId, parsedSchema);
       } catch (UniformInterfaceException e) {
         return null;
       }
